@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 const AnimeService = require('../Services/AnimeService.js');
 
 module.exports = class AnimeHandler {
@@ -11,11 +10,11 @@ module.exports = class AnimeHandler {
         return new Promise((resolve, reject) => {
             if (message.type === "query") {
                 this.animeService.find(message)
-                    .then(res => resolve('query-anime-result', res))
-                    .catch(error => reject(`AnimeService threw error: ${error.message}`))
+                    .then(result => resolve({ type: 'query-anime-result', data: result.data.Media }))
+                    .catch(errors => reject(`AnimeService threw error: ${JSON.stringify(errors)}`))
+            } else {
+                reject(`${message.type} does not exist`)
             }
-
-            reject(`${message.type} does not exist`)
         })
     }
 }

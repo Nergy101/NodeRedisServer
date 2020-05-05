@@ -2,6 +2,9 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+const AnimeHandlerClass = require('./Handlers/AnimeHandler.js');
+const AnimeHandler = new AnimeHandlerClass();
+
 const port = 3000;
 
 
@@ -32,12 +35,12 @@ io.on('connection', socket => {
     });
 
     //  RequestTypeHandler.handle(message).then(response => {...});
-    socket.on('anime', message => AnimeHandler.handleQuery(message)
-        .then((eType, res) => socket.emit(eType, res))
+    socket.on('anime', message => AnimeHandler.handle(message)
+        .then(res => { socket.emit(res.type, res.data) })
         .catch(errorMessage => socket.emit('error', { errorMessage })));
 
     socket.on('weather', message => WeatherHandler.handle(message)
-        .then((eType, res) => socket.emit(eType, res))
+        .then(res => socket.emit(res.type, res.result))
         .catch(errorMessage => socket.emit('error', { errorMessage })));
 
     socket.on('register', registration => AuthHandler.handleRegister(registration)

@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 module.exports = class AnimeService {
     constructor() {
         this.url = 'https://graphql.anilist.co';
@@ -35,10 +36,9 @@ module.exports = class AnimeService {
 
     }
 
-    find({ search = "", options }) { //anime-query object
+    find({ search = ""}) { //anime-query object
         // Define the config we'll need for our Api request
-
-        options = {
+        const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -49,11 +49,11 @@ module.exports = class AnimeService {
                 variables: { search }
             })
         };
-        
-        return Promise((resolve, reject) => {
-            fetch(this.url, this.options)
+
+        return new Promise((resolve, reject) => {
+            fetch(this.url, options)
                 .then(res => res.json()
-                    .then(json => res.ok ? resolve(json) : reject(json)))
+                    .then(json => resolve(json)).catch(err => reject(err.message)))
         })
     }
 }
