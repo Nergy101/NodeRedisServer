@@ -1,5 +1,8 @@
 module.exports = class WeatherHandler {
-    handle(message){
-        
+    handle(message) {
+        return new Promise((resolve, reject) => {
+            resolve({type, data})
+        })
+
     }
 }

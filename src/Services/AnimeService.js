@@ -36,7 +36,7 @@ module.exports = class AnimeService {
 
     }
 
-    find({ search = ""}) { //anime-query object
+    async find({ search = "" }) { //anime-query object
         // Define the config we'll need for our Api request
         const options = {
             method: 'POST',
@@ -50,10 +50,20 @@ module.exports = class AnimeService {
             })
         };
 
-        return new Promise((resolve, reject) => {
-            fetch(this.url, options)
-                .then(res => res.json()
-                    .then(json => resolve(json)).catch(err => reject(err.message)))
-        })
+
+        const result = await fetch(this.url, options);
+        return await result.json();
+
+        // return new Promise(async (resolve, reject) => {
+        //     try {
+        //         const result = await fetch(this.url, options);
+        //         resolve(result.json());
+        //         // fetch(this.url, options)
+        //         //     .then(res => res.json()
+        //         //         .then(json => resolve(json)).catch(err => reject(err.message)))
+        //     } catch (error) {
+        //         reject(error.message)
+        //     }
+        // })
     }
 }

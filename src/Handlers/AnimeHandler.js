@@ -6,15 +6,19 @@ module.exports = class AnimeHandler {
         // singleton
     }
 
-    handle(message) {
-        return new Promise((resolve, reject) => {
-            if (message.type === "query") {
-                this.animeService.find(message)
-                    .then(result => resolve({ type: 'query-anime-result', data: result.data.Media }))
-                    .catch(errors => reject(`AnimeService threw error: ${JSON.stringify(errors)}`))
-            } else {
-                reject(`${message.type} does not exist`)
+    async handle(message) {
+        console.log("Anime-handler:", message)
+        if (message.type === 'query') {
+            try {
+                const result = await this.animeService.find(message);
+                return { type: 'query-anime-result', data: result.data.Media }
+            } catch (error) {
+                throw `AnimeService threw error: ${error}`;
             }
-        })
+        }
+        else {
+            throw `Could not handle message with type: ${message.type}`
+        }
+
     }
 }
