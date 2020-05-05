@@ -21,15 +21,13 @@ var redis = new Redis({
 
 const handleMusicEvent = require('./music-event-handler.js');
 
-redis.subscribe("news", "music", function (err, count) {
-
-});
+redis.subscribe("news", "music", function (err, count) {});
 
 redis.on("message", function (channel, message) {
-    if (channel == "music") {
+    if (channel === "music") {
         handleMusicEvent(message);
     }
-    if (channel == "news") {
+    if (channel === "news") {
         console.log('no handler yet for news')
     }
 });

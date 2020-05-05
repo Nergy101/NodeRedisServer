@@ -40,7 +40,10 @@ io.on('connection', async socket => {
     //  RequestTypeHandler.handle(message).then(response => {...});
     socket.on('anime', message => AnimeHandler.handle(message)
         .then(({ type, data }) => socket.emit(type, data))
-        .catch(errorMessage => socket.emit('anime-error', { errorMessage }))
+        .catch(errorMessage => {
+            console.error(errorMessage);
+            socket.emit('anime-error', { errorMessage })
+        })
     );
 
     socket.on('weather', message => WeatherHandler.handle(message)

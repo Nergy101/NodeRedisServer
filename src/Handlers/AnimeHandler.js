@@ -6,15 +6,33 @@ module.exports = class AnimeHandler {
         // singleton
     }
 
+    Guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    async handleQuery(message) {
+        try {
+            const result = await this.animeService.find(message);
+            const data = { result: result.data.Media, metadata: message.metadata }
+            return { type: 'query-anime-result', data }
+        } catch (error) {
+            console.error(error)
+            throw `AnimeService threw error: ${error}`;
+        }
+    }
+
     async handle(message) {
-        console.log("Anime-handler:", message)
+        if (message.metadata == undefined) {
+            message.metadata = { date: Math.floor(Date.now() / 1000), guid: this.Guid() }
+        }
+
+        console.log("Anime-handler:", message.metadata.guid)
+
         if (message.type === 'query') {
-            try {
-                const result = await this.animeService.find(message);
-                return { type: 'query-anime-result', data: result.data.Media }
-            } catch (error) {
-                throw `AnimeService threw error: ${error}`;
-            }
+            return await this.handleQuery(message)
         }
         else {
             throw `Could not handle message with type: ${message.type}`
