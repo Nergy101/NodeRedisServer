@@ -23,6 +23,19 @@ module.exports = class AnimeHandler {
             throw `AnimeService threw error: ${error}`;
         }
     }
+    
+    async handleQueryList(message) {
+        try {
+            const result = await this.animeService.list(message);
+            console.log(result)
+            const data = { result: {page: result.data.Page}, metadata: message.metadata }
+            return { type: 'query-anime-result', data }
+        } catch (error) {
+            console.error(error)
+            throw `AnimeService threw error: ${error}`;
+        }
+    }
+
 
     async handle(message) {
         if (message.metadata == undefined) {
@@ -34,9 +47,11 @@ module.exports = class AnimeHandler {
         if (message.type === 'query') {
             return await this.handleQuery(message)
         }
+        if (message.type === 'query-list'){
+            return await this.handleQueryList(message);
+        }
         else {
             throw `Could not handle message with type: ${message.type}`
         }
-
     }
 }

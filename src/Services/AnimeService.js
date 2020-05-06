@@ -2,7 +2,26 @@ const fetch = require('node-fetch');
 module.exports = class AnimeService {
     constructor() {
         this.url = 'https://graphql.anilist.co';
-        this.query = `
+    }
+
+    createOptions(query, variables) {
+        return {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                query: query,
+                variables: variables
+            })
+        };
+
+    }
+
+    async find({ search = "" }) { //anime-query object
+
+        const query = `
         query ($search: String) {
             Media(type: ANIME, search: $search) {
               id
@@ -33,22 +52,41 @@ module.exports = class AnimeService {
             }
           }
         `;
-
+        const options = this.createOptions(query, { search })
+        const result = await fetch(this.url, options);
+        return await result.json();
     }
 
-    async find({ search = "" }) { //anime-query object
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                query: this.query,
-                variables: { search }
-            })
-        };
-
+    async list({ search = "", page = 1, perPage = 8 }) {
+        // lists the first 8 anime's that sound like 'pokemon', TODO: add popularity
+        const query = `
+        query($search: String, $page: Int, $perPage: Int){
+            Page(page: $page, perPage: $perPage) {
+              pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+              }
+              media(search: $search, type: ANIME) {
+                id
+                title {
+                    userPreferred
+                }
+                episodes
+                coverImage {
+                    extraLarge
+                    large
+                    medium
+                    color
+                }
+                bannerImage
+              }
+            }
+          }
+          `;
+        const options = this.createOptions(query, { search, page, perPage })
         const result = await fetch(this.url, options);
         return await result.json();
     }
